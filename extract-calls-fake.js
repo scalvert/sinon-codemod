@@ -70,30 +70,33 @@ function transformer(file, api) {
     })
     .replaceWith(replacer);
 
-  return source
-    .find(j.CallExpression, {
-      callee: {
-        type: 'MemberExpression',
-        object: {
+  ['_sandbox', 'sandbox'].forEach(name => {
+    source
+      .find(j.CallExpression, {
+        callee: {
           type: 'MemberExpression',
           object: {
-            type: 'ThisExpression'
+            type: 'MemberExpression',
+            object: {
+              type: 'ThisExpression'
+            },
+            property: {
+              type: 'Identifier',
+              name
+            }
           },
           property: {
-            type: 'Identifier',
-            name: '_sandbox'
+            name: 'stub'
           }
         },
-        property: {
-          name: 'stub'
+        arguments: {
+          length: 3
         }
-      },
-      arguments: {
-        length: 3
-      }
-    })
-    .replaceWith(replacer)
-    .toSource();
+      })
+      .replaceWith(replacer);
+  });
+
+  return source.toSource();
 }
 
 module.exports = transformer;
