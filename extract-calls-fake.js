@@ -57,9 +57,6 @@ function transformer(file, api) {
   source
     .find(j.CallExpression, {
       callee: {
-        object: {
-          name: 'sinon'
-        },
         property: {
           name: 'stub'
         }
@@ -69,32 +66,6 @@ function transformer(file, api) {
       }
     })
     .replaceWith(replacer);
-
-  ['_sandbox', 'sandbox'].forEach(name => {
-    source
-      .find(j.CallExpression, {
-        callee: {
-          type: 'MemberExpression',
-          object: {
-            type: 'MemberExpression',
-            object: {
-              type: 'ThisExpression'
-            },
-            property: {
-              type: 'Identifier',
-              name
-            }
-          },
-          property: {
-            name: 'stub'
-          }
-        },
-        arguments: {
-          length: 3
-        }
-      })
-      .replaceWith(replacer);
-  });
 
   return source.toSource();
 }
